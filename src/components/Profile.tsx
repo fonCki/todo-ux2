@@ -5,6 +5,8 @@ interface ProfileProps {
     tasks: Task[];
 }
 
+const sourceImg = 'https://raw.githubusercontent.com/fonCki/todo-ux2/refs/heads/development/public'
+
 const getAvatarForScore = (score: number): string => {
     if (score <= 50) return '/avatar/1.webp';
     if (score <= 100) return '/avatar/2.webp';
@@ -27,7 +29,7 @@ const Profile: React.FC<ProfileProps> = ({ tasks }) => {
     }, [tasks]);
 
     // Determine which avatar to display based on the score
-    const avatarSrc = getAvatarForScore(score);
+    const avatarSrc  = sourceImg + getAvatarForScore(score);
 
     return (
         <div className="fixed top-5 right-5 flex items-center space-x-4 p-4 bg-white shadow-lg rounded-full">
