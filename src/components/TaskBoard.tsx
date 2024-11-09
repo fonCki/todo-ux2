@@ -13,6 +13,11 @@ const TaskBoard: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAKeyPressed, setIsAKeyPressed] = useState(false);
 
+    useEffect(() => {
+        getRandomTask();
+        getRandomTask();
+    }, []);
+
     // Function to be called when 'a' is held down and button is clicked
     const getRandomTask = () => {
         const randomIndex = Math.floor(Math.random() * predefinedTasks.length);
