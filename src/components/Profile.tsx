@@ -32,7 +32,7 @@ const Profile: React.FC<ProfileProps> = ({ tasks }) => {
     const avatarSrc  = sourceImg + getAvatarForScore(score);
 
     return (
-        <div className="fixed top-5 right-5 flex items-center space-x-4 p-4 bg-white shadow-lg rounded-full">
+        <div className="fixed top-5 right-5 flex-col items-center space-x-4 p-4 bg-white shadow-lg rounded-t-full">
             {/* User Photo */}
             <img
                 src={avatarSrc}
