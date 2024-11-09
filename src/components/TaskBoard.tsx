@@ -1,15 +1,58 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Task as TaskType } from '../types';
 import Task from './Task';
 import AddTaskModal from './AddTaskModal';
 import Profile from './Profile'; // Import Profile component
 import { FaTrashAlt } from 'react-icons/fa';
+import FishTank from "./FishTank";
+import {predefinedTasks} from "../data/tasks";
 
 const TaskBoard: React.FC = () => {
     const [tasks, setTasks] = useState<TaskType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAKeyPressed, setIsAKeyPressed] = useState(false);
 
+    // Function to be called when 'a' is held down and button is clicked
+    const getRandomTask = () => {
+        const randomIndex = Math.floor(Math.random() * predefinedTasks.length);
+        const randomTask = predefinedTasks[randomIndex];
+        setTasks(prev => [...prev, randomTask]);
+
+    };
+
+    // Event handlers for key down and key upa
+    useEffect(() => {
+        const handleKeyDown = (event:any) => {
+            if (event.key === 'a') {
+                setIsAKeyPressed(true);
+            }
+        };
+        const handleKeyUp = (event:any) => {
+            if (event.key === 'a') {
+                setIsAKeyPressed(false);
+            }
+        };
+
+        // Add event listeners to the window
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        // Cleanup listeners on component unmount
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    // Modified onClick handler for the button
+    const handleButtonClick = () => {
+        if (isAKeyPressed) {
+            getRandomTask();
+        } else {
+            setIsModalOpen(true);
+        }
+    };
     const addTask = (taskData: { title: string; difficulty: number; deadline: Date }) => {
         const newTask: TaskType = {
             id: Math.random(),
@@ -41,12 +84,17 @@ const TaskBoard: React.FC = () => {
     const onDragEnd = (result: DropResult) => {
         const { destination, source, draggableId } = result;
 
-        if (!destination) return;
+        if (!destination) {
+            return; // Do nothing if no destination is provided (item dropped outside the list)
+        }
 
-        if (destination.droppableId === 'recycle-bin') {
+        if (destination.droppableId === 'recycle-bin' && source.droppableId === 'task-list') {
             const taskId = parseFloat(draggableId);
             handleRemoveTask(taskId);
-        } else if (source.droppableId === 'task-list' && destination.droppableId === 'task-list') {
+            return; // Exit the function to prevent further state updates after deletion
+        }
+
+        if (source.droppableId === 'task-list' && destination.droppableId === 'task-list' && destination.index !== source.index) {
             const newTasks = Array.from(tasks);
             const draggedTaskIndex = newTasks.findIndex(task => task.id === parseFloat(draggableId));
             const [movedTask] = newTasks.splice(draggedTaskIndex, 1);
@@ -55,9 +103,13 @@ const TaskBoard: React.FC = () => {
         }
     };
 
+
     return (
         <div>
-            <Profile tasks={tasks} /> {/* Add the Profile component to display photo and score */}
+            <Profile tasks={tasks} />
+            <div className="mr-20">
+
+
 
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="task-list" direction="horizontal">
@@ -91,8 +143,9 @@ const TaskBoard: React.FC = () => {
                     )}
                 </Droppable>
 
+                {/*ADD TASK BUTTON*/}
                 <div className="fixed bottom-5 right-5">
-                    <button onClick={() => setIsModalOpen(true)} className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center">+</button>
+                    <button onClick={handleButtonClick} className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center">+</button>
                 </div>
 
                 {isModalOpen && (
@@ -102,18 +155,9 @@ const TaskBoard: React.FC = () => {
                     />
                 )}
 
-                <div className="fixed bottom-20 w-full flex justify-center">
-                    <div className="flex gap-4 p-4 bg-blue-100 rounded-full shadow-md w-80 h-24 overflow-x-auto fishtank">
-                        {tasks
-                            .filter(task => task.completed)
-                            .map(task => (
-                                <div key={task.id} className="bg-green-400 w-12 h-12 rounded-full flex items-center justify-center text-xs font-semibold">
-                                    {task.title.charAt(0)}
-                                </div>
-                            ))}
-                    </div>
-                </div>
+                <FishTank tasks={tasks} /> {/* Add the FishTank component to display completed tasks */}
             </DragDropContext>
+            </div>
         </div>
     );
 };

@@ -37,7 +37,7 @@ const Profile: React.FC<ProfileProps> = ({ tasks }) => {
             <img
                 src={avatarSrc}
                 alt="User Profile"
-                className="w-12 h-12 rounded-full"
+                className="w-20 h-20 rounded-full"
             />
             {/* Score Display */}
             <div className="text-lg font-semibold">
