@@ -16,6 +16,7 @@ const TaskBoard: React.FC = () => {
     useEffect(() => {
         getRandomTask();
         getRandomTask();
+        getRandomTask();
     }, []);
 
     // Function to be called when 'a' is held down and button is clicked
