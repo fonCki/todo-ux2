@@ -23,6 +23,7 @@ const TaskBoard: React.FC = () => {
     const getRandomTask = () => {
         const randomIndex = Math.floor(Math.random() * predefinedTasks.length);
         const randomTask = predefinedTasks[randomIndex];
+        randomTask.id = Math.random();
         setTasks(prev => [...prev, randomTask]);
 
     };
